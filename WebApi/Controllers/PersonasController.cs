@@ -1,60 +1,64 @@
-﻿using Application.Interfaces.Repoitories;
-using Domain.Entities;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Application.Interfaces.Services;
+using Domain.Entities;
 
 namespace WebApi.Controllers
 {
     public class PersonasController : BaseController
     {
         private readonly ILogger<PersonasController> _logger;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IPersonaService _personaService;
 
         public PersonasController(ILogger<PersonasController> logger,
-                                    IUnitOfWork unitOfWork)
+                                  IPersonaService personaService)
         {
-            _logger = logger;
-            _unitOfWork = unitOfWork;
-        }
+            try
+            {
+                _logger = logger;
+                _personaService = personaService;
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
+        }      
         
         // GET: /Personas
         [HttpGet]
         public IEnumerable<Persona> Get()
         {
-            return _unitOfWork.Personas.GetAll();
+            return _personaService.GetAll();
         }
 
         // GET: /Personas/5
         [HttpGet("{id}")]
         public Persona Get(int id)
         {
-            return _unitOfWork.Personas.GetById(id);
+            return _personaService.GetById(id);
         }
 
         // POST: Personas
         [HttpPost]
         public void Post([FromBody] Persona persona)
         {
-            _unitOfWork.Personas.Add(persona);
-            _unitOfWork.Complete();
+            _personaService.Add(persona);
         }
 
         // PUT: Personas/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] Persona persona)
         {
-            _unitOfWork.Personas.Update(id, persona);
-            _unitOfWork.Complete();
+            _personaService.Update(id, persona);
         }
 
         // DELETE: Personas/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
-            _unitOfWork.Personas.Remove(id);
-            _unitOfWork.Complete();
+            _personaService.Remove(id);
         }
     }
 }

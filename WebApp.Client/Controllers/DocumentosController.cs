@@ -36,30 +36,31 @@ namespace WebApp.Client.Controllers
             }
         }
 
-        //// GET: Documentos/Details/5
-        //public IActionResult Details(int id)
-        //{
-        //    if (id == 0)
-        //    {
-        //        return NotFound();
-        //    }
+        // GET: Documentos/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            if (id == 0)
+            {
+                return NotFound();
+            }
 
-        //    var documento = _unitOfWork.Documentos.GetById(id);
-        //    if (documento == null)
-        //    {
-        //        return NotFound();
-        //    }
+            ApiService apiService = new ApiService();
+            var documento  = await apiService.Get<Documento>("https://localhost:44327", "/documentos",id);
+            if (documento == null)
+            {
+                return NotFound();
+            }
 
-        //    return View(documento);
-        //}
+            return View(documento.Result);
+        }
 
-        //// GET: Documentos/Create
-        //public IActionResult Create()
-        //{
-        //    ViewData["DocumentoTipoId"] = new SelectList(_unitOfWork.DocumentoTipos.GetAll(), "Id", "Id");
-        //    ViewData["PersonaId"] = new SelectList(_unitOfWork.Personas.GetAll(), "Id", "Id");
-        //    return View();
-        //}
+        // GET: Documentos/Create
+        public IActionResult Create()
+        {
+            //ViewData["DocumentoTipoId"] = new SelectList(_unitOfWork.DocumentoTipos.GetAll(), "Id", "Id");
+            //ViewData["PersonaId"] = new SelectList(_unitOfWork.Personas.GetAll(), "Id", "Id");
+            return View();
+        }
 
         //// POST: Documentos/Create
         //[HttpPost]
@@ -123,22 +124,28 @@ namespace WebApp.Client.Controllers
         //    return View(documento);
         //}
 
-        //// GET: Documentos/Delete/5
-        //public IActionResult Delete(int id)
-        //{
-        //    if (id == 0)
-        //    {
-        //        return NotFound();
-        //    }
+        // GET: Documentos/Delete/5
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id == 0)
+            {
+                return NotFound();
+            }
 
-        //    var cliente = _unitOfWork.Documentos.GetById(id);
-        //    if (cliente == null)
-        //    {
-        //        return NotFound();
-        //    }
+            ApiService apiService = new ApiService();
+            var documento = await apiService.Get<Documento>("https://localhost:44327", "/documentos", id);
+            if (documento == null)
+            {
+                return NotFound();
+            }
 
-        //    return View(cliente);
-        //}
+            return View(documento.Result);
+        }
+
+
+
+
+
 
         //// POST: Documentos/Delete/5
         //[HttpPost, ActionName("Delete")]

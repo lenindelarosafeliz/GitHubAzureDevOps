@@ -1,25 +1,36 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using Application.Interfaces.Repoitories;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Domain.Entities;
 using Microsoft.Extensions.Logging;
+using Application.Interfaces.Services;
 
 namespace WebApp.Controllers
 {
-    public class DocumentoTiposController : Controller
+    public partial class DocumentoTiposController : Controller
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<DocumentoTiposController> _logger;
-        public DocumentoTiposController(IUnitOfWork unitOfWork,
-                                        ILogger<DocumentoTiposController> logger)
+
+        private readonly ILogger<DocumentosController> _logger;
+        private readonly IDocumentoTipoService _documentoTipoService;
+
+        public DocumentoTiposController(ILogger<DocumentosController> logger,
+                                        IDocumentoTipoService documentoTipoService)
         {
-            _unitOfWork = unitOfWork;
-            _logger = logger;
+            try
+            {
+                _logger = logger;
+                _documentoTipoService = documentoTipoService;
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
         }
 
         public IActionResult Index()
         {
-            return View(_unitOfWork.DocumentoTipos.GetAll());
+            return View(_documentoTipoService.GetAll());
         }
 
         // GET: DocumentoTipos/Details/5
@@ -30,7 +41,7 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var documento = _unitOfWork.DocumentoTipos.GetById(id);
+            var documento = _documentoTipoService.GetById(id);
             if (documento == null)
             {
                 return NotFound();
@@ -52,10 +63,10 @@ namespace WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _unitOfWork.DocumentoTipos.Add(documentoTipo);
-                _unitOfWork.Complete();
+                _documentoTipoService.Add(documentoTipo);
                 return RedirectToAction(nameof(Index));
             }
+
             return View(documentoTipo);
         }
 
@@ -67,12 +78,12 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var documento = _unitOfWork.DocumentoTipos.GetById(id);
-            if (documento == null)
+            var documentoTipo = _documentoTipoService.GetById(id);
+            if (documentoTipo == null)
             {
                 return NotFound();
             }
-            return View(documento);
+            return View(documentoTipo);
         }
 
         // POST: DocumentoTipos/Edit/5
@@ -89,8 +100,8 @@ namespace WebApp.Controllers
             {
                 try
                 {
-                    _unitOfWork.DocumentoTipos.Update(id, documentoTipo);
-                    _unitOfWork.Complete();
+                    _documentoTipoService.Update(id, documentoTipo);
+
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
@@ -98,7 +109,6 @@ namespace WebApp.Controllers
                     throw ex;
                 }
             }
-
             return View(documentoTipo);
         }
 
@@ -110,7 +120,7 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var cliente = _unitOfWork.DocumentoTipos.GetById(id);
+            var cliente = _documentoTipoService.GetById(id);
             if (cliente == null)
             {
                 return NotFound();
@@ -124,8 +134,7 @@ namespace WebApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            _unitOfWork.DocumentoTipos.Remove(id);
-            _unitOfWork.Complete();
+            _documentoTipoService.Remove(id);
             return RedirectToAction(nameof(Index));
         }
     }

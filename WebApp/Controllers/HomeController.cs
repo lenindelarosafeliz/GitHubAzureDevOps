@@ -11,12 +11,28 @@ namespace WebApp.Controllers
         private readonly ILogger<HomeController> _logger;
         public HomeController(ILogger<HomeController> logger)
         {
-            _logger = logger;
+            try
+            {
+                _logger = logger;
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
         }
         public IActionResult Index()
         {
-            //return "This is my default action...";
-            return View();
+            try
+            {
+                //return "This is my default action...";
+                return View();
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
         }
 
         public IActionResult About()

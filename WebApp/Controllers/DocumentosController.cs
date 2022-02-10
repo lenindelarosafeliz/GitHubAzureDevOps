@@ -1,26 +1,42 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Application.Interfaces.Repoitories;
 using Domain.Entities;
 using Microsoft.Extensions.Logging;
+using Application.Interfaces.Services;
 
 namespace WebApp.Controllers
 {
     public partial class DocumentosController : Controller
     {
-        private readonly IUnitOfWork _unitOfWork;
+
         private readonly ILogger<DocumentosController> _logger;
-        public DocumentosController(IUnitOfWork unitOfWork,
-                                    ILogger<DocumentosController> logger)
+        private readonly IDocumentoService _documentoService;
+        private readonly IDocumentoTipoService _documentoTipoService;
+        private readonly IPersonaService _personaService;
+
+        public DocumentosController(ILogger<DocumentosController> logger,
+                                    IDocumentoService documentoService,
+                                    IDocumentoTipoService documentoTipoService,
+                                    IPersonaService personaService)
         {
-            _unitOfWork = unitOfWork;
-            _logger = logger;
+            try
+            {
+                _logger = logger;
+                _documentoService = documentoService;
+                _documentoTipoService = documentoTipoService;
+                _personaService = personaService;
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
         }
 
         public IActionResult Index()
         {
-            return View(_unitOfWork.Documentos.GetAll());
+            return View(_documentoService.GetAll());
         }
 
         // GET: Documentos/Details/5
@@ -31,7 +47,7 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var documento = _unitOfWork.Documentos.GetById(id);
+            var documento = _documentoService.GetById(id);
             if (documento == null)
             {
                 return NotFound();
@@ -43,8 +59,8 @@ namespace WebApp.Controllers
         // GET: Documentos/Create
         public IActionResult Create()
         {
-            ViewData["DocumentoTipoId"] = new SelectList(_unitOfWork.DocumentoTipos.GetAll(), "Id", "Id");
-            ViewData["PersonaId"] = new SelectList(_unitOfWork.Personas.GetAll(), "Id", "Id");
+            ViewData["DocumentoTipoId"] = new SelectList(_documentoTipoService.GetAll(), "Id", "Id");
+            ViewData["PersonaId"] = new SelectList(_personaService.GetAll(), "Id", "Id");
             return View();
         }
 
@@ -55,12 +71,12 @@ namespace WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _unitOfWork.Documentos.Add(documento);
-                _unitOfWork.Complete();
+                _documentoService.Add(documento);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["DocumentoTipoId"] = new SelectList(_unitOfWork.DocumentoTipos.GetAll(), "Id", "Id", documento.DocumentoTipoId);
-            ViewData["PersonaId"] = new SelectList(_unitOfWork.Personas.GetAll(), "Id", "Id", documento.PersonaId);
+
+            ViewData["DocumentoTipoId"] = new SelectList(_documentoTipoService.GetAll(), "Id", "Id", documento.DocumentoTipoId);
+            ViewData["PersonaId"] = new SelectList(_personaService.GetAll(), "Id", "Id", documento.PersonaId);
             return View(documento);
         }
 
@@ -72,13 +88,13 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var documento = _unitOfWork.Documentos.GetById(id);
+            var documento = _documentoService.GetById(id);
             if (documento == null)
             {
                 return NotFound();
             }
-            ViewData["DocumentoTipoId"] = new SelectList(_unitOfWork.DocumentoTipos.GetAll(), "Id", "Id", documento.DocumentoTipoId);
-            ViewData["PersonaId"] = new SelectList(_unitOfWork.Personas.GetAll(), "Id", "Id", documento.PersonaId);
+            ViewData["DocumentoTipoId"] = new SelectList(_documentoTipoService.GetAll(), "Id", "Id", documento.DocumentoTipoId);
+            ViewData["PersonaId"] = new SelectList(_personaService.GetAll(), "Id", "Id", documento.PersonaId);
             return View(documento);
         }
 
@@ -96,8 +112,8 @@ namespace WebApp.Controllers
             {
                 try
                 {
-                    _unitOfWork.Documentos.Update(id, documento);
-                    _unitOfWork.Complete();
+                    _documentoService.Update(id, documento);
+
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
@@ -105,8 +121,8 @@ namespace WebApp.Controllers
                     throw ex;
                 }
             }
-            ViewData["DocumentoTipoId"] = new SelectList(_unitOfWork.DocumentoTipos.GetAll(), "Id", "Id", documento.DocumentoTipoId);
-            ViewData["PersonaId"] = new SelectList(_unitOfWork.Personas.GetAll(), "Id", "Id", documento.PersonaId);
+            ViewData["DocumentoTipoId"] = new SelectList(_documentoTipoService.GetAll(), "Id", "Id", documento.DocumentoTipoId);
+            ViewData["PersonaId"] = new SelectList(_personaService.GetAll(), "Id", "Id", documento.PersonaId);
             return View(documento);
         }
 
@@ -118,7 +134,7 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var cliente = _unitOfWork.Documentos.GetById(id);
+            var cliente = _documentoService.GetById(id);
             if (cliente == null)
             {
                 return NotFound();
@@ -132,8 +148,7 @@ namespace WebApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            _unitOfWork.Documentos.Remove(id);
-            _unitOfWork.Complete();
+            _documentoService.Remove(id);
             return RedirectToAction(nameof(Index));
         }
     }

@@ -1,25 +1,36 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using Application.Interfaces.Repoitories;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Domain.Entities;
 using Microsoft.Extensions.Logging;
+using Application.Interfaces.Services;
 
 namespace WebApp.Controllers
 {
-    public class PersonasController : Controller
+    public partial class PersonasController : Controller
     {
-        private readonly IUnitOfWork _unitOfWork;
+
         private readonly ILogger<PersonasController> _logger;
-        public PersonasController(IUnitOfWork unitOfWork,
-                                  ILogger<PersonasController> logger)
+        private readonly IPersonaService _personaService;
+
+        public PersonasController(ILogger<PersonasController> logger,
+                                  IPersonaService personaService)
         {
-            _unitOfWork = unitOfWork;
-            _logger = logger;
+            try
+            {
+                _logger = logger;
+                _personaService = personaService;
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
         }
 
         public IActionResult Index()
         {
-            return View(_unitOfWork.Personas.GetAll());
+            return View(_personaService.GetAll());
         }
 
         // GET: Personas/Details/5
@@ -30,7 +41,7 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var persona = _unitOfWork.Personas.GetById(id);
+            var persona = _personaService.GetById(id);
             if (persona == null)
             {
                 return NotFound();
@@ -52,10 +63,10 @@ namespace WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _unitOfWork.Personas.Add(persona);
-                _unitOfWork.Complete();
+                _personaService.Add(persona);
                 return RedirectToAction(nameof(Index));
             }
+
             return View(persona);
         }
 
@@ -67,7 +78,7 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var persona = _unitOfWork.Personas.GetById(id);
+            var persona = _personaService.GetById(id);
             if (persona == null)
             {
                 return NotFound();
@@ -89,8 +100,8 @@ namespace WebApp.Controllers
             {
                 try
                 {
-                    _unitOfWork.Personas.Update(id, persona);
-                    _unitOfWork.Complete();
+                    _personaService.Update(id, persona);
+
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
@@ -109,7 +120,7 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var cliente = _unitOfWork.Personas.GetById(id);
+            var cliente = _personaService.GetById(id);
             if (cliente == null)
             {
                 return NotFound();
@@ -123,8 +134,7 @@ namespace WebApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            _unitOfWork.Personas.Remove(id);
-            _unitOfWork.Complete();
+            _personaService.Remove(id);
             return RedirectToAction(nameof(Index));
         }
     }

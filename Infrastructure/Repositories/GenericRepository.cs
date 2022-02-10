@@ -1,11 +1,11 @@
-﻿using Application.Interfaces.Repoitories;
-using Infrastructure.Contexts;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Application.Interfaces.Repositories;
+using Infrastructure.Contexts;
 
 namespace Infrastructure.Repositories
 {
@@ -27,7 +27,6 @@ namespace Infrastructure.Repositories
             else
             {
                 _context.Set<T>().Add(entity);
-
             }
         }
 

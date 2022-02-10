@@ -11,9 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApp", "WebApp\WebApp.csproj", "{3970ADB7-5EF9-44BC-8C64-67857FE0FA69}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csproj", "{EB811331-659E-4EAA-A4DF-3E545073535E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "WebApi\WebApi.csproj", "{EB811331-659E-4EAA-A4DF-3E545073535E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp.Client", "WebApp.Client\WebApp.Client.csproj", "{7500417A-45CC-49D5-A252-1312323D098B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApp.Client", "WebApp.Client\WebApp.Client.csproj", "{7500417A-45CC-49D5-A252-1312323D098B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

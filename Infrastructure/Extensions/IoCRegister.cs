@@ -1,9 +1,11 @@
-﻿using Application.Interfaces.Repoitories;
-using Infrastructure.Contexts;
-using Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Application.Interfaces.Repositories;
+using Application.Interfaces.Services;
+using Infrastructure.Contexts;
+using Infrastructure.Repositories;
+using Infrastructure.Services;
 
 namespace Infrastructure.Extensions
 {
@@ -36,19 +38,20 @@ namespace Infrastructure.Extensions
 
         private static IServiceCollection AddRegisterServices(this IServiceCollection services)
         {
-            //services
-                //.AddTransient<IGenderService, GenderService>()
-                //.AddTransient<IIdentificationTypeService, IdentificationTypeService>()
-                //.AddTransient<IUnitOfWork, UnitOfWork>();
+            services
+                .AddTransient<IDocumentoService, DocumentoService>()
+                .AddTransient<IDocumentoTipoService, DocumentoTipoService>()
+                .AddTransient<IPersonaService, PersonaService>()
+                .AddTransient<IUnitOfWork, UnitOfWork>();
             return services;
         }
 
-        private static IServiceCollection AddRegisterValidation(this IServiceCollection services)
-        {
-            //services
-            //    .AddTransient<IValidator<GenderInsertDto>, GenderInsertDtoValidator>()
-            //    .AddTransient<IValidator<GenderDto>, GenderDtoValidator>();
-            return services;
-        }
+        //private static IServiceCollection AddRegisterValidation(this IServiceCollection services)
+        //{
+        //    //services
+        //    //    .AddTransient<IValidator<GenderInsertDto>, GenderInsertDtoValidator>()
+        //    //    .AddTransient<IValidator<GenderDto>, GenderDtoValidator>();
+        //    return services;
+        //}
     }
 }

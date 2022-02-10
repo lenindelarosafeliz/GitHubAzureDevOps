@@ -1,59 +1,104 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Application.Interfaces.Repoitories;
 using Domain.Entities;
+using Application.Interfaces.Services;
 
 namespace WebApi.Controllers
 {
     public class DocumentoTiposController : BaseController
     {
         private readonly ILogger<DocumentoTiposController> _logger;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IDocumentoTipoService _documentoTipoService;
 
         public DocumentoTiposController(ILogger<DocumentoTiposController> logger,
-                                    IUnitOfWork unitOfWork)
+                                        IDocumentoTipoService documentoTipoService)
         {
-            _logger = logger;
-            _unitOfWork = unitOfWork;
+            try
+            {
+                _logger = logger;
+                _documentoTipoService = documentoTipoService;
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
         }
         
         // GET: /DocumentoTipos
         [HttpGet]
         public IEnumerable<DocumentoTipo> Get()
         {
-            return _unitOfWork.DocumentoTipos.GetAll();
+            try
+            {
+                return _documentoTipoService.GetAll();
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
         }
 
         // GET: /DocumentoTipos/5
         [HttpGet("{id}")]
         public DocumentoTipo Get(int id)
         {
-            return _unitOfWork.DocumentoTipos.GetById(id);
+            try
+            {
+                return _documentoTipoService.GetById(id);
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
         }
 
         // POST: DocumentoTipos
         [HttpPost]
         public void Post([FromBody] DocumentoTipo documentoTipos)
         {
-            _unitOfWork.DocumentoTipos.Add(documentoTipos);
-            _unitOfWork.Complete();
+            try
+            {
+                _documentoTipoService.Add(documentoTipos);
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
         }
 
         // PUT: DocumentoTipos/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] DocumentoTipo documentoTipos)
         {
-            _unitOfWork.DocumentoTipos.Update(id, documentoTipos);
-            _unitOfWork.Complete();
+            try
+            {
+                _documentoTipoService.Update(id, documentoTipos);
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
         }
 
         // DELETE: DocumentoTipos/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
-            _unitOfWork.DocumentoTipos.Remove(id);
-            _unitOfWork.Complete();
+            try
+            {
+                _documentoTipoService.Remove(id);
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw ex;
+            }
         }
     }
 }

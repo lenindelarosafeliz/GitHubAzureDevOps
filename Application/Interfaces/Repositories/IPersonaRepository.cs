@@ -1,7 +1,7 @@
 ﻿using Domain.Entities;
 using System.Collections.Generic;
 
-namespace Application.Interfaces.Repoitories
+namespace Application.Interfaces.Repositories
 {
     public interface IPersonaRepository : IGenericRepository<Persona>
     {
