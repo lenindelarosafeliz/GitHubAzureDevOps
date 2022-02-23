@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Domain.Entities;
 
 namespace Application.Interfaces.Services
 {
     public interface IDocumentoService
     {
-        IEnumerable<Documento> GetAll();
-        Documento GetById(int id);
-        IEnumerable<Documento> Find(Expression<Func<Documento, bool>> expression);
-        void Add(Documento entity);
-        void AddRange(IEnumerable<Documento> entities);
-        void Remove(Documento entity);
-        bool Exist(int id);
-        int Count(Documento entity);
-        void Remove(int id);
-        void Update(int i, Documento entity);
-        void RemoveRage(IEnumerable<Documento> entities);
+        Task<IEnumerable<Documento>> GetAllAsync();
+        Task<Documento> GetByIdAsync(int id);
+        Task<IEnumerable<Documento>> FindAsync(Expression<Func<Documento, bool>> expression);
+        Task<int> AddAsync(Documento entity);
+        Task<int> AddRangeAsync(IEnumerable<Documento> entities);
+        Task<int> CountAsync();
+        Task<int> RemoveAsync(Documento entity);
+        Task<int> RemoveAsync(int id);
+        Task<int> UpdateAsync(int i, Documento entity);
+        Task<int> RemoveRageAsync(IEnumerable<Documento> entities);
     }
 }

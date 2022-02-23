@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces.Repositories;
 using Infrastructure.Contexts;
+using System.Threading.Tasks;
 
 namespace Infrastructure
 {
@@ -20,10 +21,10 @@ namespace Infrastructure
             Documentos = documentos;
             DocumentoTipos = documentoTipos;
         }
-       
-        public int Complete()
+
+        public async Task<int> CompleteAsync()
         {
-            return _context.SaveChanges();
+            return await _context.SaveChangesAsync();
         }
         public void Dispose()
         {

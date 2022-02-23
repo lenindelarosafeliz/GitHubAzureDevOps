@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Domain.Entities;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {
@@ -21,62 +22,70 @@ namespace Infrastructure.Services
             _unitOfWork = unitOfWork;
         }
 
-        public void Add(Documento entity)
+        public async Task<int> AddAsync(Documento entity)
         {
             _unitOfWork.Documentos.Add(entity);
-            _unitOfWork.Complete();
+            return await _unitOfWork.CompleteAsync();
         }
 
-        public void AddRange(IEnumerable<Documento> entities)
+        public async Task<int> AddRangeAsync(IEnumerable<Documento> entities)
         {
-            throw new NotImplementedException();
+            _unitOfWork.Documentos.AddRange(entities);
+            return await _unitOfWork.CompleteAsync();
         }
 
-        public int Count(Documento entity)
+        public async Task<int> CountAsync()
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.Documentos.CountAsync();
         }
 
-        public bool Exist(int id)
+        public async Task<IEnumerable<Documento>> FindAsync(Expression<Func<Documento, bool>> expression)
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.Documentos.FindAsync(expression);
         }
 
-        public IEnumerable<Documento> Find(Expression<Func<Documento, bool>> expression)
+        public async Task<IEnumerable<Documento>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.Documentos.GetAllAsync(
+                includes: new Expression<Func<Documento, object>>[]
+                {
+                    d=> d.DocumentoTipo,
+                    p=> p.Persona
+                });
         }
 
-        public IEnumerable<Documento> GetAll()
+        public async Task<Documento> GetByIdAsync(int id)
         {
-            return _unitOfWork.Documentos.GetAll();
+            return await _unitOfWork.Documentos.GetByIdAsync(id,
+                  includes: new Expression<Func<Documento, object>>[]
+                {
+                    d=> d.DocumentoTipo,
+                    p=> p.Persona
+                });
         }
 
-        public Documento GetById(int id)
+        public async Task<int> RemoveAsync(Documento entity)
         {
-            return _unitOfWork.Documentos.GetById(id);
+            _unitOfWork.Documentos.Remove(entity);
+            return await _unitOfWork.CompleteAsync();
         }
 
-        public void Remove(Documento entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Remove(int id)
+        public async Task<int> RemoveAsync(int id)
         {
             _unitOfWork.Documentos.Remove(id);
-            _unitOfWork.Complete();
+            return await _unitOfWork.CompleteAsync();
         }
 
-        public void RemoveRage(IEnumerable<Documento> entities)
+        public async Task<int> RemoveRageAsync(IEnumerable<Documento> entities)
         {
-            throw new NotImplementedException();
+            _unitOfWork.Documentos.RemoveRange(entities);
+            return await _unitOfWork.CompleteAsync();
         }
 
-        public void Update(int id, Documento entity)
+        public async Task<int> UpdateAsync(int id, Documento entity)
         {
             _unitOfWork.Documentos.Update(id, entity);
-            _unitOfWork.Complete();
+            return await _unitOfWork.CompleteAsync();
         }
     }
 }

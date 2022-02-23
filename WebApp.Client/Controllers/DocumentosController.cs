@@ -1,8 +1,10 @@
 ﻿using System;
-using Microsoft.AspNetCore.Mvc;
-using Domain.Entities;
-using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
+using Domain.Entities;
 using WebApp.Client.Services;
 
 namespace WebApp.Client.Controllers
@@ -55,74 +57,95 @@ namespace WebApp.Client.Controllers
         }
 
         // GET: Documentos/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            //ViewData["DocumentoTipoId"] = new SelectList(_unitOfWork.DocumentoTipos.GetAll(), "Id", "Id");
-            //ViewData["PersonaId"] = new SelectList(_unitOfWork.Personas.GetAll(), "Id", "Id");
+            ApiService apiService = new ApiService();
+            var documentoTipos = await apiService.GetList<DocumentoTipo>("https://localhost:44327", "/documentoTipos");
+            var personas = await apiService.GetList<Persona>("https://localhost:44327", "/personas");
+
+            ViewData["DocumentoTipoId"] = new SelectList((List<DocumentoTipo>)documentoTipos.Result, "Id", "Descripcion");
+            ViewData["PersonaId"] = new SelectList((List<Persona>)personas.Result, "Id", "NombreCompleto");
             return View();
         }
 
-        //// POST: Documentos/Create
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public IActionResult Create(Documento documento)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _unitOfWork.Documentos.Add(documento);
-        //        _unitOfWork.Complete();
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["DocumentoTipoId"] = new SelectList(_unitOfWork.DocumentoTipos.GetAll(), "Id", "Id", documento.DocumentoTipoId);
-        //    ViewData["PersonaId"] = new SelectList(_unitOfWork.Personas.GetAll(), "Id", "Id", documento.PersonaId);
-        //    return View(documento);
-        //}
+        // POST: Documentos/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Documento documento)
+        {
+            ApiService apiService = new ApiService();
 
-        //// GET: Documentos/Edit/5
-        //public IActionResult Edit(int id)
-        //{
-        //    if (id == 0)
-        //    {
-        //        return NotFound();
-        //    }
+            var documentoTipos = await apiService.GetList<DocumentoTipo>("https://localhost:44327", "/documentoTipos");
+            var personas = await apiService.GetList<Persona>("https://localhost:44327", "/personas");
 
-        //    var documento = _unitOfWork.Documentos.GetById(id);
-        //    if (documento == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    ViewData["DocumentoTipoId"] = new SelectList(_unitOfWork.DocumentoTipos.GetAll(), "Id", "Id", documento.DocumentoTipoId);
-        //    ViewData["PersonaId"] = new SelectList(_unitOfWork.Personas.GetAll(), "Id", "Id", documento.PersonaId);
-        //    return View(documento);
-        //}
+            if (ModelState.IsValid)
+            {
+                var insert = await apiService.Post<Documento>("https://localhost:44327", "/documentos",documento);
+                return RedirectToAction(nameof(Index));
+            }
 
-        //// POST: Documentos/Edit/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public IActionResult Edit(int id, Documento documento)
-        //{
-        //    if (id != documento.Id)
-        //    {
-        //        return NotFound();
-        //    }
+            ViewData["DocumentoTipoId"] = new SelectList((List<DocumentoTipo>)documentoTipos.Result, "Id", "Descripcion", documento.DocumentoTipoId);
+            ViewData["PersonaId"] = new SelectList((List<Persona>)personas.Result, "Id", "NombreCompleto", documento.PersonaId);
+            return View(documento);
+        }
 
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _unitOfWork.Documentos.Update(id, documento);
-        //            _unitOfWork.Complete();
-        //            return RedirectToAction(nameof(Index));
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            throw ex;
-        //        }
-        //    }
-        //    ViewData["DocumentoTipoId"] = new SelectList(_unitOfWork.DocumentoTipos.GetAll(), "Id", "Id", documento.DocumentoTipoId);
-        //    ViewData["PersonaId"] = new SelectList(_unitOfWork.Personas.GetAll(), "Id", "Id", documento.PersonaId);
-        //    return View(documento);
-        //}
+        // GET: Documentos/Edit/5
+        public async Task<IActionResult> Edit(int id)
+        {
+            ApiService apiService = new ApiService();
+
+            var documentoTipos = await apiService.GetList<DocumentoTipo>("https://localhost:44327", "/documentoTipos");
+            var personas = await apiService.GetList<Persona>("https://localhost:44327", "/personas");
+
+            if (id == 0)
+            {
+                return NotFound();
+            }
+
+            var documento = await apiService.Get<Documento>("https://localhost:44327", "/documentos", id);
+            if (documento == null)
+            {
+                return NotFound();
+            }
+            ViewData["DocumentoTipoId"] = new SelectList((List<DocumentoTipo>)documentoTipos.Result, "Id", "Descripcion", ((Documento)(documento.Result)).DocumentoTipoId);
+            ViewData["PersonaId"] = new SelectList((List<Persona>)personas.Result, "Id", "NombreCompleto", ((Documento)(documento.Result)).PersonaId );
+            return View(documento.Result);
+        }
+
+        // POST: Documentos/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Documento documento)
+        {
+            if (id != documento.Id)
+            {
+                return NotFound();
+            }
+
+            ApiService apiService = new ApiService();
+
+            var documentoTipos = await apiService.GetList<DocumentoTipo>("https://localhost:44327", "/documentoTipos");
+            var personas = await apiService.GetList<Persona>("https://localhost:44327", "/personas");
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+
+                    var update = await apiService.Put<Documento>("https://localhost:44327", "/documentos", documento);
+                    //_unitOfWork.Documentos.Update(id, documento);
+                    //_unitOfWork.Complete();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            ViewData["DocumentoTipoId"] = new SelectList((List<DocumentoTipo>)documentoTipos.Result, "Id", "Descripcion", documento.DocumentoTipoId);
+            ViewData["PersonaId"] = new SelectList((List<Persona>)personas.Result, "Id", "NombreCompleto", documento.PersonaId);
+            return View(documento);
+        }
 
         // GET: Documentos/Delete/5
         public async Task<IActionResult> Delete(int id)
@@ -141,11 +164,6 @@ namespace WebApp.Client.Controllers
 
             return View(documento.Result);
         }
-
-
-
-
-
 
         //// POST: Documentos/Delete/5
         //[HttpPost, ActionName("Delete")]

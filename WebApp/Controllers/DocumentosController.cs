@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Application.Interfaces.Services;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebApp.Controllers
 {
@@ -36,7 +39,7 @@ namespace WebApp.Controllers
 
         public IActionResult Index()
         {
-            return View(_documentoService.GetAll());
+            return View(_documentoService.GetAllAsync());
         }
 
         // GET: Documentos/Details/5
@@ -47,7 +50,7 @@ namespace WebApp.Controllers
                 return NotFound();
             }
 
-            var documento = _documentoService.GetById(id);
+            var documento = _documentoService.GetByIdAsync(id);
             if (documento == null)
             {
                 return NotFound();
@@ -57,51 +60,51 @@ namespace WebApp.Controllers
         }
 
         // GET: Documentos/Create
-        public IActionResult Create()
+        public async Task<IActionResult> CreateAsync()
         {
-            ViewData["DocumentoTipoId"] = new SelectList(_documentoTipoService.GetAll(), "Id", "Id");
-            ViewData["PersonaId"] = new SelectList(_personaService.GetAll(), "Id", "Id");
+            ViewData["DocumentoTipoId"] = new SelectList(await _documentoTipoService.GetAllAsync(), "Id", "Descripcion");
+            ViewData["PersonaId"] = new SelectList(await _personaService.GetAllAsync(), "Id", "NombreCompleto");
             return View();
         }
 
         // POST: Documentos/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Documento documento)
+        public async Task<IActionResult> Create(Documento documento)
         {
             if (ModelState.IsValid)
             {
-                _documentoService.Add(documento);
+                var result = await _documentoService.AddAsync(documento);
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["DocumentoTipoId"] = new SelectList(_documentoTipoService.GetAll(), "Id", "Id", documento.DocumentoTipoId);
-            ViewData["PersonaId"] = new SelectList(_personaService.GetAll(), "Id", "Id", documento.PersonaId);
+            ViewData["DocumentoTipoId"] = new SelectList(await _documentoTipoService.GetAllAsync(), "Id", "Descripcion", documento.DocumentoTipoId);
+            ViewData["PersonaId"] = new SelectList(await _personaService.GetAllAsync(), "Id", "NombreCompleto", documento.PersonaId);
             return View(documento);
         }
 
         // GET: Documentos/Edit/5
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             if (id == 0)
             {
                 return NotFound();
             }
 
-            var documento = _documentoService.GetById(id);
+            var documento = _documentoService.GetByIdAsync(id).Result;
             if (documento == null)
             {
                 return NotFound();
             }
-            ViewData["DocumentoTipoId"] = new SelectList(_documentoTipoService.GetAll(), "Id", "Id", documento.DocumentoTipoId);
-            ViewData["PersonaId"] = new SelectList(_personaService.GetAll(), "Id", "Id", documento.PersonaId);
+            ViewData["DocumentoTipoId"] = new SelectList(await _documentoTipoService.GetAllAsync(), "Id", "Descripcion", documento.DocumentoTipoId);
+            ViewData["PersonaId"] = new SelectList(await _personaService.GetAllAsync(), "Id", "NombreCompleto", documento.PersonaId);
             return View(documento);
         }
 
         // POST: Documentos/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Documento documento)
+        public async Task<IActionResult> Edit(int id, Documento documento)
         {
             if (id != documento.Id)
             {
@@ -112,8 +115,7 @@ namespace WebApp.Controllers
             {
                 try
                 {
-                    _documentoService.Update(id, documento);
-
+                    var result = await _documentoService.UpdateAsync(id, documento);
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
@@ -121,20 +123,20 @@ namespace WebApp.Controllers
                     throw ex;
                 }
             }
-            ViewData["DocumentoTipoId"] = new SelectList(_documentoTipoService.GetAll(), "Id", "Id", documento.DocumentoTipoId);
-            ViewData["PersonaId"] = new SelectList(_personaService.GetAll(), "Id", "Id", documento.PersonaId);
+            ViewData["DocumentoTipoId"] = new SelectList(await _documentoTipoService.GetAllAsync(), "Id", "Descripcion", documento.DocumentoTipoId);
+            ViewData["PersonaId"] = new SelectList(await _personaService.GetAllAsync(), "Id", "NombreCompleto", documento.PersonaId);
             return View(documento);
         }
 
         // GET: Documentos/Delete/5
-        public IActionResult Delete(int id)
+        public async Task<IActionResult>  Delete(int id)
         {
             if (id == 0)
             {
                 return NotFound();
             }
 
-            var cliente = _documentoService.GetById(id);
+            var cliente = await _documentoService.GetByIdAsync(id);
             if (cliente == null)
             {
                 return NotFound();
@@ -146,10 +148,20 @@ namespace WebApp.Controllers
         // POST: Documentos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            _documentoService.Remove(id);
+            var result = await _documentoService.RemoveAsync(id);
             return RedirectToAction(nameof(Index));
+        }
+
+
+        [HttpGet]
+        public JsonResult GetAllRecords()
+        {
+            var data = _documentoService.GetAllAsync().Result;
+            var output = new { status = "success", total = data.Count(), records = data };
+
+            return Json(output);
         }
     }
 }

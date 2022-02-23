@@ -14,6 +14,7 @@ namespace Domain.Entities
                 return ($"{Nombre} {Apellido}");
             }
         }
+
         public DateTime FechaNacimiento { get; set; }
     }
 }

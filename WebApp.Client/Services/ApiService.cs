@@ -89,7 +89,7 @@ namespace WebApp.Client.Services
             }
         }
 
-        public async Task<Response> Post<T>(string urlBase, string servicePrefix, string controller, T model)
+        public async Task<Response> Post<T>(string urlBase, string controller, T model)
         {
             try
             {
@@ -97,8 +97,7 @@ namespace WebApp.Client.Services
                 var content = new StringContent(request, Encoding.UTF8, "application/json");
                 var client = new HttpClient();
                 client.BaseAddress = new Uri(urlBase);
-                var url = string.Format("{0}{1}", servicePrefix, controller);
-                var response = await client.PostAsync(url, content);
+                var response = await client.PostAsync(controller, content);
                 var result = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -126,5 +125,91 @@ namespace WebApp.Client.Services
                 };
             }
         }
+
+        public async Task<Response> Put<T>(string urlBase, string controller, T model)
+        {
+            try
+            {
+                var request = JsonConvert.SerializeObject(model);
+                var content = new StringContent(request, Encoding.UTF8, "application/json");
+                var client = new HttpClient();
+                client.BaseAddress = new Uri(urlBase);
+                var url = string.Format("{0}{1}/{2}", controller, model.GetHashCode());
+
+               // var response = await client.PostAsync(controller, content);
+                var response = await client.PutAsync(controller, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new Response
+                    {
+                        IsSuccess = false,
+                        Message = response.StatusCode.ToString(),
+                    };
+                }
+
+                var result = await response.Content.ReadAsStringAsync();
+                var newRecord = JsonConvert.DeserializeObject<T>(result);
+
+                return new Response
+                {
+                    IsSuccess = true,
+                    Message = "Record updated OK",
+                    Result = newRecord,
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Response
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        public async Task<Response> Delete<T>(string urlBase, string controller, T model)
+        {
+            try
+            {
+                var client = new HttpClient();
+                var request = JsonConvert.SerializeObject(model);
+                var content = new StringContent(request, Encoding.UTF8, "application/json");
+                client.BaseAddress = new Uri(urlBase);
+                var url = string.Format("{0}{1}/{2}",  controller, model.GetHashCode());
+                var response = await client.DeleteAsync(url);
+                //var response = await client.DeleteAsync(controller, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new Response
+                    {
+                        IsSuccess = false,
+                        Message = response.StatusCode.ToString(),
+                    };
+                }
+
+                return new Response
+                {
+                    IsSuccess = true,
+                    Message = "Record deleted OK",
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Response
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+
+
+
+
+
+
     }
 }

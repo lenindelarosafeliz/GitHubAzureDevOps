@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Application.Interfaces.Services;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebApp.Controllers
 {
@@ -28,20 +30,20 @@ namespace WebApp.Controllers
             }
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(_documentoTipoService.GetAll());
+            return View(await _documentoTipoService.GetAllAsync());
         }
 
         // GET: DocumentoTipos/Details/5
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
             if (id == 0)
             {
                 return NotFound();
             }
 
-            var documento = _documentoTipoService.GetById(id);
+            var documento = await _documentoTipoService.GetByIdAsync(id);
             if (documento == null)
             {
                 return NotFound();
@@ -59,11 +61,11 @@ namespace WebApp.Controllers
         // POST: DocumentoTipos/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(DocumentoTipo documentoTipo)
+        public async Task<IActionResult> Create(DocumentoTipo documentoTipo)
         {
             if (ModelState.IsValid)
             {
-                _documentoTipoService.Add(documentoTipo);
+                var result = await _documentoTipoService.AddAsync(documentoTipo);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -71,14 +73,14 @@ namespace WebApp.Controllers
         }
 
         // GET: DocumentoTipos/Edit/5
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             if (id == 0)
             {
                 return NotFound();
             }
 
-            var documentoTipo = _documentoTipoService.GetById(id);
+            var documentoTipo = await _documentoTipoService.GetByIdAsync(id);
             if (documentoTipo == null)
             {
                 return NotFound();
@@ -89,7 +91,7 @@ namespace WebApp.Controllers
         // POST: DocumentoTipos/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, DocumentoTipo documentoTipo)
+        public async Task<IActionResult> Edit(int id, DocumentoTipo documentoTipo)
         {
             if (id != documentoTipo.Id)
             {
@@ -100,7 +102,7 @@ namespace WebApp.Controllers
             {
                 try
                 {
-                    _documentoTipoService.Update(id, documentoTipo);
+                    var result = await _documentoTipoService.UpdateAsync(id, documentoTipo);
 
                     return RedirectToAction(nameof(Index));
                 }
@@ -113,14 +115,14 @@ namespace WebApp.Controllers
         }
 
         // GET: DocumentoTipos/Delete/5
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             if (id == 0)
             {
                 return NotFound();
             }
 
-            var cliente = _documentoTipoService.GetById(id);
+            var cliente = await _documentoTipoService.GetByIdAsync(id);
             if (cliente == null)
             {
                 return NotFound();
@@ -132,10 +134,28 @@ namespace WebApp.Controllers
         // POST: DocumentoTipos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            _documentoTipoService.Remove(id);
+            var result = await _documentoTipoService.RemoveAsync(id);
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public JsonResult GetAllRecords()
+        {
+            var data = _documentoTipoService.GetAllAsync().Result;
+
+            //List<Documento> documents = new List<Documento>();
+            //foreach (var document in data)
+            //{
+            //    documents.Add(new Document { Id = document.Id, Description = document.Description, PersonId = document.PersonId, DocumentTypeId = document.DocumentTypeId });
+            //}
+
+            var output = new { status = "success", total = data.Count(), records = data };
+
+            return Json(output);
+        }
+
+
     }
 }

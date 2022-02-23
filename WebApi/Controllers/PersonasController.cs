@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Application.Interfaces.Services;
@@ -24,41 +25,41 @@ namespace WebApi.Controllers
                 _logger.LogError(ex.Message);
                 throw ex;
             }
-        }      
-        
+        }
+
         // GET: /Personas
         [HttpGet]
-        public IEnumerable<Persona> Get()
+        public async Task<IEnumerable<Persona>> Get()
         {
-            return _personaService.GetAll();
+            return await _personaService.GetAllAsync();
         }
 
         // GET: /Personas/5
         [HttpGet("{id}")]
-        public Persona Get(int id)
+        public async Task<Persona> Get(int id)
         {
-            return _personaService.GetById(id);
+            return await _personaService.GetByIdAsync(id);
         }
 
         // POST: Personas
         [HttpPost]
-        public void Post([FromBody] Persona persona)
+        public async Task<int> Post([FromBody] Persona persona)
         {
-            _personaService.Add(persona);
+            return await _personaService.AddAsync(persona);
         }
 
         // PUT: Personas/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] Persona persona)
+        public async Task<int> Put(int id, [FromBody] Persona persona)
         {
-            _personaService.Update(id, persona);
+            return await _personaService.UpdateAsync(id, persona);
         }
 
         // DELETE: Personas/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<int> Delete(int id)
         {
-            _personaService.Remove(id);
+            return await _personaService.RemoveAsync(id);
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Domain.Entities;
 using Application.Interfaces.Services;
+using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
@@ -25,14 +26,14 @@ namespace WebApi.Controllers
                 throw ex;
             }
         }
-        
+
         // GET: /DocumentoTipos
         [HttpGet]
-        public IEnumerable<DocumentoTipo> Get()
+        public async Task<IEnumerable<DocumentoTipo>> Get()
         {
             try
             {
-                return _documentoTipoService.GetAll();
+                return await _documentoTipoService.GetAllAsync();
             }
             catch (System.Exception ex)
             {
@@ -43,11 +44,11 @@ namespace WebApi.Controllers
 
         // GET: /DocumentoTipos/5
         [HttpGet("{id}")]
-        public DocumentoTipo Get(int id)
+        public async Task<DocumentoTipo> Get(int id)
         {
             try
             {
-                return _documentoTipoService.GetById(id);
+                return await _documentoTipoService.GetByIdAsync(id);
             }
             catch (System.Exception ex)
             {
@@ -58,11 +59,11 @@ namespace WebApi.Controllers
 
         // POST: DocumentoTipos
         [HttpPost]
-        public void Post([FromBody] DocumentoTipo documentoTipos)
+        public async Task<int> Post([FromBody] DocumentoTipo documentoTipos)
         {
             try
             {
-                _documentoTipoService.Add(documentoTipos);
+                return await _documentoTipoService.AddAsync(documentoTipos);
             }
             catch (System.Exception ex)
             {
@@ -73,11 +74,11 @@ namespace WebApi.Controllers
 
         // PUT: DocumentoTipos/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] DocumentoTipo documentoTipos)
+        public async Task<int> Put(int id, [FromBody] DocumentoTipo documentoTipos)
         {
             try
             {
-                _documentoTipoService.Update(id, documentoTipos);
+                return await _documentoTipoService.UpdateAsync(id, documentoTipos);
             }
             catch (System.Exception ex)
             {
@@ -88,11 +89,11 @@ namespace WebApi.Controllers
 
         // DELETE: DocumentoTipos/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<int> Delete(int id)
         {
             try
             {
-                _documentoTipoService.Remove(id);
+                return await _documentoTipoService.RemoveAsync(id);
             }
             catch (System.Exception ex)
             {

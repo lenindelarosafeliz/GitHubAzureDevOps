@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Application.Interfaces.Repositories
 {
@@ -7,6 +8,6 @@ namespace Application.Interfaces.Repositories
         IPersonaRepository Personas { get; }
         IDocumentoRepository Documentos { get; }
         IDocumentoTipoRepository DocumentoTipos { get; }
-        int Complete();
+        Task<int> CompleteAsync();
     }
 }

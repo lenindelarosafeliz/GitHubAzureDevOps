@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Application.Interfaces.Repositories;
 using Infrastructure.Contexts;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
@@ -17,7 +18,7 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public void Add(T entity)
+       public void Add(T entity)
         {
             EntityEntry dbEntityEntry = _context.Entry(entity);
             if (dbEntityEntry.State != EntityState.Detached)
@@ -26,7 +27,7 @@ namespace Infrastructure.Repositories
             }
             else
             {
-                _context.Set<T>().Add(entity);
+                _context.Set<T>().AddAsync(entity);
             }
         }
 
@@ -45,9 +46,9 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public int Count(T entity)
+        public async Task<int> CountAsync()
         {
-            return _context.Set<T>().Count();
+            return await _context.Set<T>().CountAsync();
         }
 
         public void AddRange(IEnumerable<T> entities)
@@ -55,25 +56,28 @@ namespace Infrastructure.Repositories
             _context.Set<T>().AddRange(entities);
         }
 
-        public IEnumerable<T> Find(Expression<Func<T, bool>> expression)
+        public async Task< IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression)
         {
-            return _context.Set<T>().Where(expression);
+            return await _context.Set<T>().Where(expression).ToListAsync();
         }
 
-        public IEnumerable<T> GetAll()
+        public async Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
         {
-            return _context.Set<T>().ToList();
+            var listado = _context.Set<T>();
+            includes.ToList().ForEach(i => listado.Include(i).Load());
+            return await listado.ToListAsync();
         }
 
-        public T GetById(int id)
+        public async Task<T> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes)
         {
-            return _context.Set<T>().Find(id);
+            var listado = _context.Set<T>();
+            includes.ToList().ForEach(i => listado.Include(i).Load());
+            return await listado.FindAsync(id);
         }
 
         public void Update(int id, T entity)
         {
             _context.Entry(entity).State = EntityState.Modified;
-            //_context.Set<T>().Update(entity);
         }
 
         public void Remove(T entity)

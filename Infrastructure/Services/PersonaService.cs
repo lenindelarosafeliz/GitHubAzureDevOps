@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Domain.Entities;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {
@@ -13,7 +14,6 @@ namespace Infrastructure.Services
         private readonly ILogger<IPersonaService> _logger;
         private readonly IUnitOfWork _unitOfWork;
 
-
         public PersonaService(ILogger<IPersonaService> logger,
                                        IUnitOfWork unitOfWork)
         {
@@ -21,62 +21,61 @@ namespace Infrastructure.Services
             _unitOfWork = unitOfWork;
         }
 
-        public void Add(Persona entity)
+        public async Task<int> AddAsync(Persona entity)
         {
             _unitOfWork.Personas.Add(entity);
-            _unitOfWork.Complete();
+            return await _unitOfWork.CompleteAsync();
         }
 
-        public void AddRange(IEnumerable<Persona> entities)
+        public async Task<int> AddRangeAsync(IEnumerable<Persona> entities)
         {
-            throw new NotImplementedException();
+            _unitOfWork.Personas.AddRange(entities);
+            return await _unitOfWork.CompleteAsync();
         }
 
-        public int Count(Persona entity)
+        public async Task<int> CountAsync()
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.Personas.CountAsync();
         }
 
-        public bool Exist(int id)
+        public async Task<IEnumerable<Persona>> FindAsync(Expression<Func<Persona, bool>> expression)
         {
-            throw new NotImplementedException();
+          return await  _unitOfWork.Personas.FindAsync(expression);
+          
         }
 
-        public IEnumerable<Persona> Find(Expression<Func<Persona, bool>> expression)
+        public async  Task<IEnumerable<Persona>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.Personas.GetAllAsync();
         }
-
-        public IEnumerable<Persona> GetAll()
+        
+        public async Task<Persona> GetByIdAsync(int id)
         {
-            return _unitOfWork.Personas.GetAll();
+            return await _unitOfWork.Personas.GetByIdAsync(id);
         }
 
-        public Persona GetById(int id)
+        public async Task<int> RemoveAsync(Persona entity)
         {
-            return _unitOfWork.Personas.GetById(id);
+            _unitOfWork.Personas.Remove(entity);
+            return await _unitOfWork.CompleteAsync();
         }
 
-        public void Remove(Persona entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Remove(int id)
+        public async Task<int> RemoveAsync(int id)
         {
             _unitOfWork.Personas.Remove(id);
-            _unitOfWork.Complete();
+            return await _unitOfWork.CompleteAsync();
         }
 
-        public void RemoveRage(IEnumerable<Persona> entities)
+        public async Task<int> RemoveRageAsync(IEnumerable<Persona> entities)
         {
-            throw new NotImplementedException();
+            _unitOfWork.Personas.RemoveRange(entities);
+            return await _unitOfWork.CompleteAsync();
         }
 
-        public void Update(int id, Persona entity)
+        public async Task<int> UpdateAsync(int id, Persona entity)
         {
             _unitOfWork.Personas.Update(id, entity);
-            _unitOfWork.Complete();
+            return await _unitOfWork.CompleteAsync();
         }
     }
 }

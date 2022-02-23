@@ -4,12 +4,18 @@
     var address = ViewData["Address"] as AddressViewModel;
 
 }
-<h1>@ViewData["Title"]</h1>
 
-@ViewData["Message"] World!
+<section class="content-header">
+    <h1>@ViewData["Title"]</h1>
+</section>
+<!-- Main content -->
+<section class="content container-fluid">
+  
 
-<address>
-    @address.Name<br>
-    @address.Street<br>
-    @address.City, @address.State @address.PostalCode
-</address>
+    @ViewData["Message"] World!
+    <address>
+        @address.Name<br>
+        @address.Street<br>
+        @address.City, @address.State @address.PostalCode
+    </address>
+</section>
